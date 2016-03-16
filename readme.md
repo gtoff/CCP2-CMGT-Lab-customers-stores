@@ -39,4 +39,4 @@ Here are just some quick information pointers:
     - spring_datasource_username: e.g., root
     - spring_datasource_password: e.g., yourpassword
     - spring_datasource_url: JDBC Endpoint URI for MySQL DB e.g., jdbc:mysql://localhost:3306/customers
-    - integration_stores_uri: URI the Customers service uses to connect to the Stores service e.g., http://stores:8081
+    - integration_stores_uri: URI the Customers service uses to connect to the Stores service e.g., http://localhost:8081
