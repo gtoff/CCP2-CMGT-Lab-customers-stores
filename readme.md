@@ -1,21 +1,42 @@
-# REST based micro-services sample
+# REST based micro-services sample - using Kubernetes
 
-- Three Spring Boot based Maven projects that are standalone applications:
-  - Stores (MongoDB, exposing a few Starbucks shops across north america, geo-spatial functionality)
-  - Customers (JPA)
-  - Customers UI (Angular and Spring Boot CLI backend)
-- The customers application tries to discover a search-by-location-resource and periodically verifying it's still available (see `StoreIntegration`).
-- If the remote system is found the customers app includes a link to let clients follow to the remote system and thus find stores near the customer.
+You have already seen this application in the PaaS lecture.
+In this Lab we weill deploy it on a Kubernetes cluster using kubectl
 
 ## Running Instructions
-- Before try to run the services, make sure you have MySQL or PostgreSQL Server and a MongoDB running on localhost.
-- Make sure you have [Spring Boot for Groovy installed] (http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#getting-started-gvm-cli-installation)
-- Make sure [Spring Cloud CLI is installed] (https://github.com/spring-cloud/spring-cloud-cli)
-- To run the services, just execute "mvn spring-boot:run" in each project subfolder, and "spring run app.groovy" for the UI.
+- Before deploying the appliction containers you will need to deploy the databases
+- First make sure you are using your group namespace to deploy:
+  $ kubectl config set-context aws_kubernetes --namespace=group1
+- Then deploy the MongoDB service and pod:
+  $ kubectl create -f mongo_svc.yml
+  $ kubectl create -f mysql_pod.yml
 
-## IDE Support
+## Lab Instructions
 
-To use these projects in an IDE you will need the [project Lombok](http://projectlombok.org/features/index.html) agent. Full instructions can be found in the Lombok website. The
-sign that you need to do this is a lot of compiler errors to do with
-missing methods and fields.
+Please follow the detailed lab instructons on [OLAT](https://olat.zhaw.ch/auth/RepositoryEntry/196968466/CourseNode/74113252610159/path%3D~~03%20Labs/0).
 
+Here are just some quick information pointers:
+
+- Docker images:
+  - User Interface:  icclabcna/customers-stores-ui:latest
+  - Store REST Microservice: icclabcna/rest-microservices-store:latest
+  - Customers REST Microservice: icclabcna/rest-microservices-customers:latest
+
+- User Interface Docker container:
+  - Runs on port: 9900
+  - ENVIRONMENT VARIABLES:
+    - zuul_routes_customers_url: URL to which Zuul forwards Customers services requests e.g., http://localhost:9000
+    - zuul_routes_stores_url: URL to which Zuul forwards Stores services requests e.g., http://localhost:8081
+
+- Stores REST Microservice Docker container:
+  - Runs on port: 8081
+  - ENVIRONMENT VARIABLES:
+    - SPRING_DATA_MONGODB_URI: JDBC Endpoint URI for MongoDB e.g., mongodb://localhost:27017/stores
+
+- Customers REST Microservice Docker container:
+  - Runs on port: 9000
+  - ENVIRONMENT VARIABLES:
+    - spring_datasource_username: e.g., root
+    - spring_datasource_password: e.g., yourpassword
+    - spring_datasource_url: JDBC Endpoint URI for MySQL DB e.g., jdbc:mysql://localhost:3306/customers
+    - integration_stores_uri: URI the Customers service uses to connect to the Stores service e.g., http://stores:8081
